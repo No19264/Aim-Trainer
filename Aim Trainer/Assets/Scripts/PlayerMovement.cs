@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] CharacterController cc;
+    [SerializeField] Rigidbody rb;
     [SerializeField] GameObject groundCheck;
+    [SerializeField] Transform orientation;
     [SerializeField] LayerMask groundLayer;
+    [Space]
     [SerializeField] float speed;
-    [SerializeField] float accelerationTime;
-    [SerializeField] float decelerationTime;
+    [SerializeField] float groundDrag;
+    [SerializeField] float jumpPower;
     [SerializeField] int maxJumpCount;
-    [SerializeField] float jumpHeight;
-    [SerializeField] float gravity;
 
-    Vector3 velocity;
+    Vector3 moveDirection;
     float actualSpeed;
     float speedValue;
     int jumps;
@@ -27,57 +27,34 @@ public class PlayerMovement : MonoBehaviour
         float VInput = Input.GetAxisRaw("Vertical");
         bool isGrounded = Physics.CheckSphere(groundCheck.transform.position, 0.25f, groundLayer);
 
-        // 2D MOVEMENT
-        // Move the Character Controller
-        if (HInput != 0 && velocity.x < speed)
-        {
-            velocity.x += Time.deltaTime;
+        // Get the direction the player wants to move
+        moveDirection = orientation.forward * VInput + orientation.right * HInput;
+        
+        // Horizontal Movement Constraints
+        Vector3 HVelocity = new Vector3(moveDirection.x, 0f, moveDirection.z);
+        if (HVelocity.magnitude > speed) {
+            HVelocity = HVelocity.normalized;
+            rb.velocity = new Vector3(HVelocity.x * speed, rb.velocity.y, HVelocity.z * speed);
         }
-        if (HInput == 0 && velocity.x > 0)
-        {
-            velocity.x += Time.deltaTime;
-        }
-        /*
-        // Accelerate player if moving and not reached max speed yet
-        if ((HInput != 0 || VInput != 0) && actualSpeed < speed)
-        {
-            actualSpeed = Lerp(0, speed, speedValue += (Time.deltaTime / accelerationTime));
-        }
-        // Decelerate player if there are no inputs and player hasn't decelerated yet
-        if ((HInput == 0 && VInput == 0) && actualSpeed > 0.05f)
-        {
-            actualSpeed = Lerp(0, speed, speedValue += (Time.deltaTime / accelerationTime));
-            if (actualSpeed != 0)
-            {
-                actualSpeed = 0;
-            }
-        }
-        */
-
-        Vector3 move = transform.right * HInput + transform.forward * VInput;
-        cc.Move(move * speed * Time.deltaTime);
-
-
-        // VERTICAL MOVEMENT
-        // Implementing Gravity
-        velocity.y -= gravity * Time.deltaTime;
-
-        // Jump the player if they can do so
-        if (Input.GetKeyDown(KeyCode.Space) && jumps > 0)
-        {
-            velocity.y = jumpHeight;
+        
+        // Jumping
+        if (Input.GetKeyDown(KeyCode.Space) && jumps > 0) {
+            rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
             jumps -= 1;
         }
 
-        // Enable jumping and reset gravity if grounded while falling
-        if (isGrounded)
-        {
-            if (velocity.y < 0f)
-            {
-                velocity.y = 0f;
-            }
+        // Ground conditionals
+        if (isGrounded) {
+            rb.drag = groundDrag;
             jumps = maxJumpCount;
+        } else {
+            rb.drag = groundDrag / 2;
         }
-        cc.Move(velocity * Time.deltaTime);
+    }
+
+    void FixedUpdate() 
+    {
+        // Add force if player is moving
+        rb.AddForce(moveDirection.normalized * speed * 10f);
     }
 }

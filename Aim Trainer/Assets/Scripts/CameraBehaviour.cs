@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class CameraBehaviour : MonoBehaviour
 {
-    // Credtis: https://www.youtube.com/watch?v=_QajrabyTJc
-    [SerializeField] Transform playerBody;
+    [SerializeField] Transform playerTransform;
     [SerializeField] float sensitivityX;
     [SerializeField] float sensitivityY;
 
     float xRotation;
+    float yRotation;
 
     // Start is called before the first frame update
     void Start()
@@ -25,11 +25,12 @@ public class CameraBehaviour : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * sensitivityX * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivityY * Time.deltaTime;
 
+        yRotation += mouseX;
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90, 90);
 
-        // Rotating the camera
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        playerBody.Rotate(Vector3.up * mouseX);
+        // Rotating the camera and player
+        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f);
+        playerTransform.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
 }
