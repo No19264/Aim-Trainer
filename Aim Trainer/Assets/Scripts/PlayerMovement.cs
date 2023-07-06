@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float groundDrag;
     [SerializeField] float jumpPower;
     [SerializeField] int maxJumpCount;
+    [SerializeField] float descendingGravityForce;
 
     Vector3 moveDirection;
     float actualSpeed;
@@ -41,6 +42,14 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && jumps > 0) {
             rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
             jumps -= 1;
+        }
+
+        // Force player down when descending (extra gravity) 
+        // Clamp the players falling speed as well
+        if (rb.velocity.y < 0.5f && !isGrounded)
+        {
+            if (rb.velocity.y < -20f) rb.velocity = new Vector3(rb.velocity.x, -20f, rb.velocity.z); 
+            else rb.AddForce(Vector3.down * descendingGravityForce);
         }
 
         // Ground conditionals

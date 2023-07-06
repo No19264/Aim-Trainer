@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class CameraBehaviour : MonoBehaviour
@@ -10,6 +11,9 @@ public class CameraBehaviour : MonoBehaviour
 
     float xRotation;
     float yRotation;
+    float recoilRotation;
+    float targetRecoilRotation;
+    bool recoiling;
 
     // Start is called before the first frame update
     void Start()
@@ -25,12 +29,31 @@ public class CameraBehaviour : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * sensitivityX * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivityY * Time.deltaTime;
 
+        // Defining Rotations
         yRotation += mouseX;
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90, 90);
 
+        // When recoiling, raise the recoil rotation. When not, decrease the recoil rotation.
+        if (recoiling) {
+            if (recoilRotation < targetRecoilRotation) recoilRotation += 120 * Time.deltaTime;
+            else {
+                targetRecoilRotation = 0;
+                recoiling = false;
+            }
+        } else {
+            if (recoilRotation > targetRecoilRotation) recoilRotation -= 60 * Time.deltaTime;
+            else recoilRotation = 0;
+        }
+        
         // Rotating the camera and player
-        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f);
+        transform.rotation = Quaternion.Euler(xRotation - recoilRotation, yRotation, 0f);
         playerTransform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+    }
+
+    public void ApplyRecoil(float rotation)
+    {
+        recoiling = true;
+        targetRecoilRotation = recoilRotation + rotation;
     }
 }
