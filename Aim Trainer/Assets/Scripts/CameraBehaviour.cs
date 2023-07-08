@@ -13,6 +13,7 @@ public class CameraBehaviour : MonoBehaviour
     float yRotation;
     float recoilRotation;
     float targetRecoilRotation;
+    float recoilSpeed = 60f;
     bool recoiling;
 
     // Start is called before the first frame update
@@ -36,7 +37,7 @@ public class CameraBehaviour : MonoBehaviour
 
         // When recoiling, raise the recoil rotation. When not, decrease the recoil rotation.
         if (recoiling) {
-            if (recoilRotation < targetRecoilRotation) recoilRotation += 120 * Time.deltaTime;
+            if (recoilRotation < targetRecoilRotation) recoilRotation += recoilSpeed * Time.deltaTime;
             else {
                 targetRecoilRotation = 0;
                 recoiling = false;
@@ -55,5 +56,6 @@ public class CameraBehaviour : MonoBehaviour
     {
         recoiling = true;
         targetRecoilRotation = recoilRotation + rotation;
+        recoilSpeed = rotation * 10; // This makes sure that no matter the recoil, it should take 0.1s to reach the endpoint
     }
 }
