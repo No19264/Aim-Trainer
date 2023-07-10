@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] Rigidbody rb;
     [SerializeField] GameObject groundCheck;
     [SerializeField] Transform orientation;
+    [SerializeField] Animator cameraAnim;
     [SerializeField] LayerMask groundLayer;
     [Space]
     [SerializeField] float speed;
@@ -15,10 +15,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] int maxJumpCount;
     [SerializeField] float descendingGravityForce;
 
+    Rigidbody rb;
     Vector3 moveDirection;
     float actualSpeed;
     float speedValue;
     int jumps;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -52,6 +58,14 @@ public class PlayerMovement : MonoBehaviour
             else rb.AddForce(Vector3.down * descendingGravityForce);
         }
 
+        // Crouch
+        if (Input.GetKeyDown(KeyCode.LeftControl)) {
+            cameraAnim.SetBool("Crouching", true);
+        }
+        if (Input.GetKeyUp(KeyCode.LeftControl)) {
+            cameraAnim.SetBool("Crouching", false);
+        }
+
         // Ground conditionals
         if (isGrounded) {
             rb.drag = groundDrag;
@@ -63,7 +77,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate() 
     {
-        // Add force if player is moving
+        // Add force in the direction the player wants to move
         rb.AddForce(moveDirection.normalized * speed * 10f);
     }
 }

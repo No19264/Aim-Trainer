@@ -58,4 +58,8 @@ public class CameraBehaviour : MonoBehaviour
         targetRecoilRotation = recoilRotation + rotation;
         recoilSpeed = rotation * 10; // This makes sure that no matter the recoil, it should take 0.1s to reach the endpoint
     }
+
+    public void SetFOV(float FOV) {
+        GetComponent<Camera>().fieldOfView = FOV;
+    }
 }
