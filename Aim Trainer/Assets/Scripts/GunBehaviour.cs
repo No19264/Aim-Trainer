@@ -9,12 +9,15 @@ public class GunBehaviour : MonoBehaviour
     [SerializeField] Animator gunPosAnim;
     [SerializeField] Weapon[] weaponList;
     [SerializeField] Transform[] barrelTransformList;
+    [SerializeField] LayerMask raycastIgnore;
+    [SerializeField] RecticleManager rm;
     [Space]
     [SerializeField] GameObject rifleAttachment;
     [SerializeField] GameObject rifleStock;
     [SerializeField] GameObject sniperAttachment;
     [SerializeField] GameObject sniperStock;
     [SerializeField] GameObject scope;
+    [SerializeField] GameObject markerPrefab;
 
     CameraBehaviour cameraScript;
     Weapon selectedWeapon;
@@ -26,6 +29,7 @@ public class GunBehaviour : MonoBehaviour
     {
         cameraScript = mainCamera.GetComponent<CameraBehaviour>();
         selectedWeapon = weaponList[weaponIndex];
+        raycastIgnore = ~raycastIgnore;
     }
     
     // Update is called once per frame
@@ -64,13 +68,27 @@ public class GunBehaviour : MonoBehaviour
     // Spawn bullet and call the ApplyRecoil() function in the camera script
     void ShootBullet()
     {
+        // Cast the ray
         RaycastHit hit;
         Vector3 point;
-        if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out hit, selectedWeapon.range)) {
+        if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out hit, selectedWeapon.range, raycastIgnore)) {
             point = hit.point;
+            // Damage the enemy if they are hit
+            if (hit.collider.tag == "Body") { 
+                hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(selectedWeapon.damage);
+                Debug.Log("Body shot");
+                rm.CreateHitMarker();
+            }
+            if (hit.collider.tag == "Head") {
+                hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(selectedWeapon.damage * 1.5f);
+                Debug.Log("Head shot");
+                rm.CreateHitMarker(true);
+            }
         } else {
             point = mainCamera.transform.forward * selectedWeapon.range + mainCamera.transform.position;
         }
+
+        // Spawn the bullet visual and apply recoil
         Instantiate(selectedWeapon.bullet, barrelTransformList[weaponIndex].position, Quaternion.LookRotation(point - barrelTransformList[weaponIndex].position));
         mainCamera.GetComponent<CameraBehaviour>().ApplyRecoil(selectedWeapon.recoil);
 

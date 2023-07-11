@@ -20,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     float actualSpeed;
     float speedValue;
     int jumps;
+    bool crouching;
 
     void Awake()
     {
@@ -58,13 +59,10 @@ public class PlayerMovement : MonoBehaviour
             else rb.AddForce(Vector3.down * descendingGravityForce);
         }
 
-        // Crouch
-        if (Input.GetKeyDown(KeyCode.LeftControl)) {
-            cameraAnim.SetBool("Crouching", true);
-        }
-        if (Input.GetKeyUp(KeyCode.LeftControl)) {
-            cameraAnim.SetBool("Crouching", false);
-        }
+        // Crouching
+        if (Input.GetKeyDown(KeyCode.LeftControl)) crouching = true;
+        if (Input.GetKeyUp(KeyCode.LeftControl)) crouching = false;
+        cameraAnim.SetBool("Crouching", crouching);
 
         // Ground conditionals
         if (isGrounded) {
@@ -78,6 +76,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate() 
     {
         // Add force in the direction the player wants to move
-        rb.AddForce(moveDirection.normalized * speed * 10f);
+        if (!crouching) rb.AddForce(moveDirection.normalized * speed * 10f);
+        else rb.AddForce(moveDirection.normalized * speed / 2 * 10f);
     }
 }

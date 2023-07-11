@@ -26,7 +26,8 @@ public class BulletBehaviour : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    void OnCollisionEnter() {
-        Destroy(gameObject);
+    void OnColliderEnter(Collider other) 
+    {
+        if (other.tag != "BulletIgnore") Destroy(gameObject);
     }
 }
