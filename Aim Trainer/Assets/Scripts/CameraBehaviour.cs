@@ -6,9 +6,11 @@ using UnityEngine;
 public class CameraBehaviour : MonoBehaviour
 {
     [SerializeField] Transform playerTransform;
-    [SerializeField] float sensitivityX;
-    [SerializeField] float sensitivityY;
+    [SerializeField] float horizontalSensitivity;
+    [SerializeField] float verticalSensitivity;
 
+    float sensitivityX;
+    float sensitivityY;
     float xRotation;
     float yRotation;
     float recoilRotation;
@@ -21,6 +23,8 @@ public class CameraBehaviour : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        sensitivityX = horizontalSensitivity;
+        sensitivityY = verticalSensitivity;
     }
 
     // Update is called once per frame
@@ -61,5 +65,10 @@ public class CameraBehaviour : MonoBehaviour
 
     public void SetFOV(float FOV) {
         GetComponent<Camera>().fieldOfView = FOV;
+    }
+
+    public void ScaleCameraSensitivity(float percent) {
+        sensitivityX = horizontalSensitivity * percent;
+        sensitivityY = verticalSensitivity * percent;
     }
 }
