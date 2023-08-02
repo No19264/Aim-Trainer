@@ -1,43 +1,33 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
-public class CameraBehaviour : MonoBehaviour
-{
-    [SerializeField] Transform playerTransform;
-    [SerializeField] float horizontalSensitivity;
-    [SerializeField] float verticalSensitivity;
+public class CameraBehaviour : MonoBehaviour {
 
+    [SerializeField] Transform playerTransform;
+	[Range(100f, 1000f)] [SerializeField] float horizontalSensitivity;
+    [Range(100f, 1000f)][SerializeField] float verticalSensitivity;
+	[Range(45f, 90f)][SerializeField] float yRotationLimit = 88f;
+
+	Vector2 rotation = Vector2.zero;
+	const string xAxis = "Mouse X";
+	const string yAxis = "Mouse Y";
     float sensitivityX;
     float sensitivityY;
-    float xRotation;
-    float yRotation;
     float recoilRotation;
     float targetRecoilRotation;
     float recoilSpeed = 60f;
     bool recoiling;
 
-    // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        sensitivityX = horizontalSensitivity;
-        sensitivityY = verticalSensitivity;
     }
 
-    // Update is called once per frame
-    void Update()
+	void Update()
     {
-        // Get Mouse input
-        float mouseX = Input.GetAxis("Mouse X") * sensitivityX * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * sensitivityY * Time.deltaTime;
-
-        // Defining Rotations
-        yRotation += mouseX;
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90, 90);
+		rotation.x += Input.GetAxis(xAxis) * horizontalSensitivity * Time.deltaTime; // REMOVE Time.deltaTime if navigation gets too laggy
+		rotation.y += Input.GetAxis(yAxis) * verticalSensitivity * Time.deltaTime;
+		rotation.y = Mathf.Clamp(rotation.y, -yRotationLimit, yRotationLimit);
 
         // When recoiling, raise the recoil rotation. When not, decrease the recoil rotation.
         if (recoiling) {
@@ -50,11 +40,13 @@ public class CameraBehaviour : MonoBehaviour
             if (recoilRotation > targetRecoilRotation) recoilRotation -= 60 * Time.deltaTime;
             else recoilRotation = 0;
         }
-        
-        // Rotating the camera and player
-        transform.rotation = Quaternion.Euler(xRotation - recoilRotation, yRotation, 0f);
-        playerTransform.rotation = Quaternion.Euler(0f, yRotation, 0f);
-    }
+
+        // Applying Rotations to Camera and Player
+        var xQuat = Quaternion.AngleAxis(rotation.x, Vector3.up);
+		var yQuat = Quaternion.AngleAxis(rotation.y + recoilRotation, Vector3.left);
+		transform.localRotation = xQuat * yQuat;
+        playerTransform.rotation = xQuat;
+	}
 
     public void ApplyRecoil(float rotation)
     {

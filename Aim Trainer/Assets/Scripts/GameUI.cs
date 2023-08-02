@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class GameUI : MonoBehaviour
@@ -57,6 +58,7 @@ public class GameUI : MonoBehaviour
 
     public void LeaveButton()
     {
-        Debug.Log("Return to home page :)");
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Start");
     }
 }

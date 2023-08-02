@@ -25,7 +25,7 @@ public class GunBehaviour : MonoBehaviour
     [SerializeField] GameObject SniperScreen;
 
     CameraBehaviour cameraScript;
-    int weaponIndex = 0;
+    int weaponIndex = 999;
     float timeToNextShot;
     bool aiming;
     bool reloading;
@@ -34,57 +34,67 @@ public class GunBehaviour : MonoBehaviour
     {
         cameraScript = mainCamera.GetComponent<CameraBehaviour>();
         raycastIgnore = ~raycastIgnore;
+        SwitchToWeapon();
     }
     
     // Update is called once per frame
     void Update()
     {
-        if (!reloading) {
-            // Shoot when left click
-            if (Input.GetMouseButton(0) && timeToNextShot <= 0)
-            {
-                if (weaponList[weaponIndex].currentAmmo > 0) {
-                    ShootBullet();
-                    timeToNextShot = 60 / weaponList[weaponIndex].rpm;
-                } else {
-                    // Flash the ammo screen
+        if (weaponIndex != 999)
+        {
+            if (!reloading) {
+                // Shoot when left click
+                if (Input.GetMouseButton(0) && timeToNextShot <= 0)
+                {
+                    if (weaponList[weaponIndex].currentAmmo > 0) {
+                        ShootBullet();
+                        timeToNextShot = 60 / weaponList[weaponIndex].rpm;
+                    } else {
+                        // Flash the ammo screen
+                    }
                 }
-            }
 
-            // Reloading
-            if (Input.GetKeyDown(KeyCode.R)) {
-                reloading = true;
-                DoReloadSuspension();
-                gunAnim.SetTrigger("reload");
-            }
-
-            // Aiming 
-            if (Input.GetMouseButtonDown(1)) {
-                aiming = true;
-                gunPosAnim.SetBool("Aiming", true);
-                if (weaponIndex != 2) {
-                    cameraScript.SetFOV(70f - (float)(weaponIndex + 1) * 10f);
-                    cameraScript.ScaleCameraSensitivity(1f - (float)(weaponIndex + 1) * 0.1f);
+                // Reloading
+                if (Input.GetKeyDown(KeyCode.R)) {
+                    reloading = true;
+                    DoReloadSuspension();
+                    gunAnim.SetTrigger("reload");
                 }
-            }
-            if (Input.GetMouseButtonUp(1)) { 
-                aiming = false;
-                gunPosAnim.SetBool("Aiming", false);
-                cameraScript.SetFOV(70f);
-                cameraScript.ScaleCameraSensitivity(1f);
-                fullGun.SetActive(true);
-                SniperScreen.SetActive(false);
-            }
 
-            // Switching weapons
-            if (!aiming) {
-                if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchToWeapon(0);
-                if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchToWeapon(1);
-                if (Input.GetKeyDown(KeyCode.Alpha3)) SwitchToWeapon(2);
+                // Aiming 
+                if (Input.GetMouseButtonDown(1)) {
+                    aiming = true;
+                    gunPosAnim.SetBool("Aiming", true);
+                    if (weaponIndex != 2) {
+                        cameraScript.SetFOV(70f - (float)(weaponIndex + 1) * 10f);
+                        cameraScript.ScaleCameraSensitivity(1f - (float)(weaponIndex + 1) * 0.1f);
+                    }
+                }
+                if (Input.GetMouseButtonUp(1)) { 
+                    ResetAiming();
+                }
+
             }
+            // Time down the shot timer
+            if (timeToNextShot > 0) timeToNextShot -= Time.deltaTime;
         }
-        // Time down the shot timer
-        if (timeToNextShot > 0) timeToNextShot -= Time.deltaTime;
+
+        // Switching weapons
+        if (!aiming) {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchToWeapon(0);
+            if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchToWeapon(1);
+            if (Input.GetKeyDown(KeyCode.Alpha3)) SwitchToWeapon(2);
+        }
+    }
+
+    void ResetAiming()
+    {
+        aiming = false;
+        gunPosAnim.SetBool("Aiming", false);
+        cameraScript.SetFOV(70f);
+        cameraScript.ScaleCameraSensitivity(1f);
+        fullGun.SetActive(true);
+        SniperScreen.SetActive(false);
     }
 
     // Spawn bullet and call the ApplyRecoil() function in the camera script
@@ -128,47 +138,53 @@ public class GunBehaviour : MonoBehaviour
     }
 
     // Switch weapon stats, what parts are displayed, if the weapon index exists
-    void SwitchToWeapon(int index)
+    void SwitchToWeapon(int index = 999)
     {
-        // Check to see if the weapon is in weaponList
-        if (index < weaponList.Length) {
-            // Check to see if you are not already selecting weapon
-            if (weaponIndex != index) {
-                // Change weapon stats
-                weaponIndex = index;
-                // Change Gun visual
-                switch (weaponIndex) {
-                    case 0:
-                        rifleAttachment.SetActive(false);
-                        rifleStock.SetActive(false);
-                        sniperAttachment.SetActive(false);
-                        sniperStock.SetActive(false);
-                        scope.SetActive(false);
-                        gunPosAnim.SetBool("Using Sniper", false);
-                        break;
-                    case 1:
-                        rifleAttachment.SetActive(true);
-                        rifleStock.SetActive(true);
-                        sniperAttachment.SetActive(false);
-                        sniperStock.SetActive(false);
-                        scope.SetActive(false);
-                        gunPosAnim.SetBool("Using Sniper", false);
-                        break;
-                    case 2:
-                        rifleAttachment.SetActive(false);
-                        rifleStock.SetActive(false);
-                        sniperAttachment.SetActive(true);
-                        sniperStock.SetActive(true);
-                        scope.SetActive(true);
-                        gunPosAnim.SetBool("Using Sniper", true);
-                        break;
-                    default:
-                        Debug.Log("Gun model gameobject not callibrated");
-                        break;
+        if (index != 999) {
+            // Check to see if the weapon is in weaponList
+            if (index < weaponList.Length) {
+                // Check to see if you are not already selecting weapon
+                if (weaponIndex != index) {
+                    // Change weapon stats
+                    weaponIndex = index;
+                    // Change Gun visual
+                    fullGun.SetActive(true);
+                    switch (weaponIndex) {
+                        case 0:
+                            rifleAttachment.SetActive(false);
+                            rifleStock.SetActive(false);
+                            sniperAttachment.SetActive(false);
+                            sniperStock.SetActive(false);
+                            scope.SetActive(false);
+                            gunPosAnim.SetBool("Using Sniper", false);
+                            break;
+                        case 1:
+                            rifleAttachment.SetActive(true);
+                            rifleStock.SetActive(true);
+                            sniperAttachment.SetActive(false);
+                            sniperStock.SetActive(false);
+                            scope.SetActive(false);
+                            gunPosAnim.SetBool("Using Sniper", false);
+                            break;
+                        case 2:
+                            rifleAttachment.SetActive(false);
+                            rifleStock.SetActive(false);
+                            sniperAttachment.SetActive(true);
+                            sniperStock.SetActive(true);
+                            scope.SetActive(true);
+                            gunPosAnim.SetBool("Using Sniper", true);
+                            break;
+                        default:
+                            Debug.Log("Gun model gameobject not callibrated");
+                            break;
+                    }
                 }
-            }
-        } else Debug.Log("Weapon Index does not exist");
-        gu.UpdateText();
+            } else Debug.Log("Weapon Index does not exist");
+            gu.UpdateText();
+        } else {
+            weaponIndex = 999;
+            fullGun.SetActive(false);
+        }
     }
 
     public void SniperAimEffects()
@@ -181,6 +197,7 @@ public class GunBehaviour : MonoBehaviour
 
     async void DoReloadSuspension() 
     {
+        ResetAiming();
         await Task.Delay(1500);
         weaponList[weaponIndex].currentAmmo = weaponList[weaponIndex].clipSize;
         reloading = false;
@@ -188,20 +205,23 @@ public class GunBehaviour : MonoBehaviour
     }
 
     public int GetAmmoCount {
-        get {return weaponList[weaponIndex].currentAmmo;}
+        get {return (weaponIndex != 999) ? weaponList[weaponIndex].currentAmmo : 0;}
     }
 
     public int GetClipSize {
-        get {return weaponList[weaponIndex].clipSize;}
+        get {return (weaponIndex != 999) ? weaponList[weaponIndex].clipSize : 0;}
     }
 
     // Returns the accuracy decimal to 2DP is it is not NaN (Not A Number)
     public float[] GetWeaponAccuracy {
         get{
-            float first = (!float.IsNaN(weaponList[weaponIndex].hitPercent)) ? weaponList[weaponIndex].hitPercent: 0f;
-            float second = (!float.IsNaN(weaponList[weaponIndex].headHitPercent)) ? weaponList[weaponIndex].headHitPercent : 0f;
-            float[] accuracy = new float[] {first, second};
-            return accuracy;
+            if (weaponIndex != 999) {
+                float first = (!float.IsNaN(weaponList[weaponIndex].hitPercent)) ? weaponList[weaponIndex].hitPercent: 0f;
+                float second = (!float.IsNaN(weaponList[weaponIndex].headHitPercent)) ? weaponList[weaponIndex].headHitPercent : 0f;
+                return new float[] {first, second};
+            } else {
+                return new float[] {0f, 0f};
+            }
         }
     }
 
