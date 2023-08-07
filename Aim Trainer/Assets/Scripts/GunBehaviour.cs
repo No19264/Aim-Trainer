@@ -78,13 +78,6 @@ public class GunBehaviour : MonoBehaviour
             // Time down the shot timer
             if (timeToNextShot > 0) timeToNextShot -= Time.deltaTime;
         }
-
-        // Switching weapons
-        if (!aiming) {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchToWeapon(0);
-            if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchToWeapon(1);
-            if (Input.GetKeyDown(KeyCode.Alpha3)) SwitchToWeapon(2);
-        }
     }
 
     void ResetAiming()
@@ -138,52 +131,55 @@ public class GunBehaviour : MonoBehaviour
     }
 
     // Switch weapon stats, what parts are displayed, if the weapon index exists
-    void SwitchToWeapon(int index = 999)
+    public void SwitchToWeapon(int index = 999)
     {
-        if (index != 999) {
-            // Check to see if the weapon is in weaponList
-            if (index < weaponList.Length) {
-                // Check to see if you are not already selecting weapon
-                if (weaponIndex != index) {
-                    // Change weapon stats
-                    weaponIndex = index;
-                    // Change Gun visual
-                    fullGun.SetActive(true);
-                    switch (weaponIndex) {
-                        case 0:
-                            rifleAttachment.SetActive(false);
-                            rifleStock.SetActive(false);
-                            sniperAttachment.SetActive(false);
-                            sniperStock.SetActive(false);
-                            scope.SetActive(false);
-                            gunPosAnim.SetBool("Using Sniper", false);
-                            break;
-                        case 1:
-                            rifleAttachment.SetActive(true);
-                            rifleStock.SetActive(true);
-                            sniperAttachment.SetActive(false);
-                            sniperStock.SetActive(false);
-                            scope.SetActive(false);
-                            gunPosAnim.SetBool("Using Sniper", false);
-                            break;
-                        case 2:
-                            rifleAttachment.SetActive(false);
-                            rifleStock.SetActive(false);
-                            sniperAttachment.SetActive(true);
-                            sniperStock.SetActive(true);
-                            scope.SetActive(true);
-                            gunPosAnim.SetBool("Using Sniper", true);
-                            break;
-                        default:
-                            Debug.Log("Gun model gameobject not callibrated");
-                            break;
+        if (!aiming) {
+            gu.UpdateEquipedIcon(index);
+            if (index != 999) {
+                // Check to see if the weapon is in weaponList
+                if (index < weaponList.Length) {
+                    // Check to see if you are not already selecting weapon
+                    if (weaponIndex != index) {
+                        // Change weapon stats
+                        weaponIndex = index;
+                        // Change Gun visual
+                        fullGun.SetActive(true);
+                        switch (weaponIndex) {
+                            case 0:
+                                rifleAttachment.SetActive(false);
+                                rifleStock.SetActive(false);
+                                sniperAttachment.SetActive(false);
+                                sniperStock.SetActive(false);
+                                scope.SetActive(false);
+                                gunPosAnim.SetBool("Using Sniper", false);
+                                break;
+                            case 1:
+                                rifleAttachment.SetActive(true);
+                                rifleStock.SetActive(true);
+                                sniperAttachment.SetActive(false);
+                                sniperStock.SetActive(false);
+                                scope.SetActive(false);
+                                gunPosAnim.SetBool("Using Sniper", false);
+                                break;
+                            case 2:
+                                rifleAttachment.SetActive(false);
+                                rifleStock.SetActive(false);
+                                sniperAttachment.SetActive(true);
+                                sniperStock.SetActive(true);
+                                scope.SetActive(true);
+                                gunPosAnim.SetBool("Using Sniper", true);
+                                break;
+                            default:
+                                Debug.Log("Gun model gameobject not callibrated");
+                                break;
+                        }
                     }
-                }
-            } else Debug.Log("Weapon Index does not exist");
-            gu.UpdateText();
-        } else {
-            weaponIndex = 999;
-            fullGun.SetActive(false);
+                } else Debug.Log("Weapon Index does not exist");
+                gu.UpdateText();
+            } else {
+                weaponIndex = 999;
+                fullGun.SetActive(false);
+            }
         }
     }
 

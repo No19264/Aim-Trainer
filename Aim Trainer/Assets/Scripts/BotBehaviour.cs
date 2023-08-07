@@ -5,15 +5,16 @@ using UnityEngine;
 public class BotBehaviour : MonoBehaviour
 {
     [SerializeField] float speed;
-    [SerializeField] float moveTime;
+    [SerializeField] float maxDistance;
     [SerializeField] float rotationSpeed;
 
     Rigidbody rb;
     Animator anim;
     float health;
     bool moving = true;
-    float direction = 1;
-    float time;
+    int crouchState = 0;
+    float distanceTravelled = 0;
+    Vector3 posLastFrame;
 
     // Start is called before the first frame update
     void Start()
@@ -21,30 +22,32 @@ public class BotBehaviour : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         health = 100f;
+        crouchState = Random.Range(0, 4);
+        anim.SetBool("Crouched", (crouchState == 0) ? true : false);
+        anim.SetBool("Moving", moving);
+        posLastFrame = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Temporary Movement
-        if (time <= 0) {
-            direction = -direction;
-            time = moveTime;
-        } else {
-            time -= Time.deltaTime;
-        }
-        rb.velocity = new Vector3(speed * direction, rb.velocity.y, rb.velocity.z);
+        // Make the bot move slower if crouching (crouching when crouchstate == 0)
+        float speedMultiplier = (crouchState == 0) ? 1f : 0f;
+        rb.velocity = transform.forward * (speed - (speed * 0.3f * speedMultiplier));
 
-        // Rotate to face direction bot is moving
-        Vector3 flatVelocity =  new Vector3(rb.velocity.x, 0f, rb.velocity.y);
+        // Measure the distance the bot has walked. Destory bot once travelled that distance
+        distanceTravelled += Mathf.Abs((transform.position - posLastFrame).magnitude);
+        if (distanceTravelled >= maxDistance) { Destroy(gameObject); }
+        posLastFrame = transform.position;
+
+        // Rotate to face direction bot is moving -- KEEP FOR POSSIBLE FUTURE USE
+        /*
+        Vector3 flatVelocity = new Vector3(rb.velocity.x, 0f, rb.velocity.y);
         if (moving && flatVelocity.magnitude != 0) {
             Quaternion targetRotation = Quaternion.LookRotation(flatVelocity.normalized);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
         }
-
-        // Animations
-        anim.SetBool("Moving", true);
-        anim.SetBool("Crouched", false);
+        */
     }
 
     public void DamageBot(float damage) 

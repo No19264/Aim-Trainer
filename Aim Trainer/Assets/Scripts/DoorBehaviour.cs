@@ -9,6 +9,7 @@ public class DoorBehaviour : MonoBehaviour
     [SerializeField] float detectRange;
     Animator animator;
     bool lastStateOpen;
+    bool locked;
 
     // Start is called before the first frame update
     void Awake()
@@ -19,16 +20,29 @@ public class DoorBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Vector3.Distance(transform.position, target.transform.position) < detectRange) {
-            if (!lastStateOpen) {
-                animator.SetTrigger("Open");
-                lastStateOpen = true;
-            }
-        } else {
-            if (lastStateOpen) {
-                animator.SetTrigger("Close");
-                lastStateOpen = false;
+        if (!locked) {
+            if (Vector3.Distance(transform.position, target.transform.position) < detectRange) {
+                if (!lastStateOpen) {
+                    animator.SetTrigger("Open");
+                    lastStateOpen = true;
+                }
+            } else {
+                if (lastStateOpen) {
+                    animator.SetTrigger("Close");
+                    lastStateOpen = false;
+                }
             }
         }
+    }
+
+    public void LockDoor()
+    {
+        animator.SetTrigger("Close");
+        locked = true;
+    }
+
+    public void UnlockDoor()
+    {
+        locked = false;
     }
 }
