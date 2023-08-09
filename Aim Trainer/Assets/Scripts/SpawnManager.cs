@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
+    [SerializeField] PlayerData pd;
+    [Space]
     [SerializeField] GameObject botPrefab;
     [SerializeField] GameObject[] spawnPoints;
     [SerializeField] float timeBetweenSpawns;
     [SerializeField] int botCount;
-    [SerializeField] bool constantSpawnRange;
-    [Range(0, 4)] [SerializeField] int spawnRange;
 
     bool spawning = false;
     int botsToSpawn;
@@ -24,8 +24,8 @@ public class SpawnManager : MonoBehaviour
                 if (spawnTime > 0) {
                     spawnTime -= Time.deltaTime;
                 } else {
-                    GameObject randomSpawn = constantSpawnRange ? spawnPoints[Random.Range(2 * spawnRange, (2 * spawnRange) + 2)]
-                        : spawnPoints[Random.Range(0, (2 * spawnRange) + 2)];
+                    GameObject randomSpawn = pd.constantSpawnRange ? spawnPoints[Random.Range(2 * pd.spawnRange, (2 * pd.spawnRange) + 2)]
+                        : spawnPoints[Random.Range(0, (2 * pd.spawnRange) + 2)];
                     botCollection.Add(Instantiate(botPrefab, randomSpawn.transform.position, randomSpawn.transform.rotation));
                     botsToSpawn -= 1;
                     spawnTime = timeBetweenSpawns;

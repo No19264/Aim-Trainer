@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class CameraBehaviour : MonoBehaviour {
 
+    [SerializeField] PlayerData pd;
+    [Space]
     [SerializeField] Transform playerTransform;
-	[Range(100f, 1000f)] [SerializeField] float horizontalSensitivity;
-    [Range(100f, 1000f)][SerializeField] float verticalSensitivity;
 	[Range(45f, 90f)][SerializeField] float yRotationLimit = 88f;
 
 	Vector2 rotation = Vector2.zero;
@@ -25,8 +25,8 @@ public class CameraBehaviour : MonoBehaviour {
 
 	void Update()
     {
-		rotation.x += Input.GetAxis(xAxis) * horizontalSensitivity * Time.deltaTime; // REMOVE Time.deltaTime if navigation gets too laggy
-		rotation.y += Input.GetAxis(yAxis) * verticalSensitivity * Time.deltaTime;
+		rotation.x += Input.GetAxis(xAxis) * pd.horizontalSensitivity * Time.deltaTime; // REMOVE Time.deltaTime if navigation gets too laggy
+		rotation.y += Input.GetAxis(yAxis) * pd.verticalSensitivity * Time.deltaTime;
 		rotation.y = Mathf.Clamp(rotation.y, -yRotationLimit, yRotationLimit);
 
         // When recoiling, raise the recoil rotation. When not, decrease the recoil rotation.
@@ -60,7 +60,7 @@ public class CameraBehaviour : MonoBehaviour {
     }
 
     public void ScaleCameraSensitivity(float percent) {
-        sensitivityX = horizontalSensitivity * percent;
-        sensitivityY = verticalSensitivity * percent;
+        sensitivityX = pd.horizontalSensitivity * percent;
+        sensitivityY = pd.verticalSensitivity * percent;
     }
 }

@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class BotBehaviour : MonoBehaviour
 {
-    [SerializeField] float speed;
+    [SerializeField] PlayerData pd;
+    [Space]
     [SerializeField] float maxDistance;
     [SerializeField] float rotationSpeed;
 
@@ -33,7 +34,7 @@ public class BotBehaviour : MonoBehaviour
     {
         // Make the bot move slower if crouching (crouching when crouchstate == 0)
         float speedMultiplier = (crouchState == 0) ? 1f : 0f;
-        rb.velocity = transform.forward * (speed - (speed * 0.3f * speedMultiplier));
+        rb.velocity = transform.forward * (pd.botSpeed - (pd.botSpeed * 0.3f * speedMultiplier));
 
         // Measure the distance the bot has walked. Destory bot once travelled that distance
         distanceTravelled += Mathf.Abs((transform.position - posLastFrame).magnitude);

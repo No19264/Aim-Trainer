@@ -5,10 +5,12 @@ using UnityEngine;
 public class GameStartPoint : MonoBehaviour
 {
     [SerializeField] GameManager gm;
-    
-    void OnTriggerStay(Collider other)
+    [SerializeField] float arenaZBound;
+    [SerializeField] GameObject player;
+
+    void Update()
     {
-        if (other.tag == "Player" && Input.GetKeyDown(KeyCode.T) && !gm.IsPlaying) {
+        if (player.transform.position.z >= arenaZBound && Input.GetKeyDown(KeyCode.T) && !gm.IsPlaying) {
             gm.StartGame();
         }
     }

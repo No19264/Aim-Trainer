@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class GunBehaviour : MonoBehaviour
 {
+    [SerializeField] PlayerData pd;
     [SerializeField] GameObject mainCamera;
     [SerializeField] Animator gunAnim;
     [SerializeField] Animator gunPosAnim;
-    [SerializeField] Weapon[] weaponList;
     [SerializeField] Transform[] barrelTransformList;
     [SerializeField] LayerMask raycastIgnore;
     [SerializeField] RecticleManager rm;
@@ -46,9 +46,9 @@ public class GunBehaviour : MonoBehaviour
                 // Shoot when left click
                 if (Input.GetMouseButton(0) && timeToNextShot <= 0)
                 {
-                    if (weaponList[weaponIndex].currentAmmo > 0) {
+                    if (pd.weaponList[weaponIndex].currentAmmo > 0) {
                         ShootBullet();
-                        timeToNextShot = 60 / weaponList[weaponIndex].rpm;
+                        timeToNextShot = 60 / pd.weaponList[weaponIndex].rpm;
                     } else {
                         // Flash the ammo screen
                     }
@@ -96,30 +96,30 @@ public class GunBehaviour : MonoBehaviour
         // Cast the ray
         RaycastHit hit;
         Vector3 point;
-        if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out hit, weaponList[weaponIndex].range, raycastIgnore)) {
+        if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out hit, pd.weaponList[weaponIndex].range, raycastIgnore)) {
             point = hit.point;
             
             // Damage the enemy if they are hit
             if (hit.collider.tag == "Body") { 
-                hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(weaponList[weaponIndex].damage);
-                weaponList[weaponIndex].hitCount += 1;
+                hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(pd.weaponList[weaponIndex].damage);
+                pd.weaponList[weaponIndex].hitCount += 1;
                 rm.CreateHitMarker();
             }
             if (hit.collider.tag == "Head") {
-                hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(weaponList[weaponIndex].damage * 1.5f);
-                weaponList[weaponIndex].hitCount += 1;
-                weaponList[weaponIndex].headHitCount += 1;
+                hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(pd.weaponList[weaponIndex].damage * 1.5f);
+                pd.weaponList[weaponIndex].hitCount += 1;
+                pd.weaponList[weaponIndex].headHitCount += 1;
                 rm.CreateHitMarker(true);
             }
         } else {
-            point = mainCamera.transform.forward * weaponList[weaponIndex].range + mainCamera.transform.position;
+            point = mainCamera.transform.forward * pd.weaponList[weaponIndex].range + mainCamera.transform.position;
         }
         
         // Spawn the bullet visual, apply recoil and reduce ammo
-        Instantiate(weaponList[weaponIndex].bullet, barrelTransformList[weaponIndex].position, Quaternion.LookRotation(point - barrelTransformList[weaponIndex].position));
-        mainCamera.GetComponent<CameraBehaviour>().ApplyRecoil(weaponList[weaponIndex].recoil);
-        weaponList[weaponIndex].currentAmmo -= 1;
-        weaponList[weaponIndex].shotCount += 1;
+        Instantiate(pd.weaponList[weaponIndex].bullet, barrelTransformList[weaponIndex].position, Quaternion.LookRotation(point - barrelTransformList[weaponIndex].position));
+        mainCamera.GetComponent<CameraBehaviour>().ApplyRecoil(pd.weaponList[weaponIndex].recoil);
+        pd.weaponList[weaponIndex].currentAmmo -= 1;
+        pd.weaponList[weaponIndex].shotCount += 1;
 
         // Play gun animation
         if (weaponIndex == 0) gunAnim.SetTrigger("pistolShoot");
@@ -136,8 +136,8 @@ public class GunBehaviour : MonoBehaviour
         if (!aiming) {
             gu.UpdateEquipedIcon(index);
             if (index != 999) {
-                // Check to see if the weapon is in weaponList
-                if (index < weaponList.Length) {
+                // Check to see if the weapon is in pd.weaponList
+                if (index < pd.weaponList.Length) {
                     // Check to see if you are not already selecting weapon
                     if (weaponIndex != index) {
                         // Change weapon stats
@@ -195,25 +195,25 @@ public class GunBehaviour : MonoBehaviour
     {
         ResetAiming();
         await Task.Delay(1500);
-        weaponList[weaponIndex].currentAmmo = weaponList[weaponIndex].clipSize;
+        pd.weaponList[weaponIndex].currentAmmo = pd.weaponList[weaponIndex].clipSize;
         reloading = false;
         gu.UpdateText();
     }
 
     public int GetAmmoCount {
-        get {return (weaponIndex != 999) ? weaponList[weaponIndex].currentAmmo : 0;}
+        get {return (weaponIndex != 999) ? pd.weaponList[weaponIndex].currentAmmo : 0;}
     }
 
     public int GetClipSize {
-        get {return (weaponIndex != 999) ? weaponList[weaponIndex].clipSize : 0;}
+        get {return (weaponIndex != 999) ? pd.weaponList[weaponIndex].clipSize : 0;}
     }
 
     // Returns the accuracy decimal to 2DP is it is not NaN (Not A Number)
     public float[] GetWeaponAccuracy {
         get{
             if (weaponIndex != 999) {
-                float first = (!float.IsNaN(weaponList[weaponIndex].hitPercent)) ? weaponList[weaponIndex].hitPercent: 0f;
-                float second = (!float.IsNaN(weaponList[weaponIndex].headHitPercent)) ? weaponList[weaponIndex].headHitPercent : 0f;
+                float first = (!float.IsNaN(pd.weaponList[weaponIndex].hitPercent)) ? pd.weaponList[weaponIndex].hitPercent: 0f;
+                float second = (!float.IsNaN(pd.weaponList[weaponIndex].headHitPercent)) ? pd.weaponList[weaponIndex].headHitPercent : 0f;
                 return new float[] {first, second};
             } else {
                 return new float[] {0f, 0f};
@@ -227,7 +227,7 @@ public class GunBehaviour : MonoBehaviour
             float hit = 0f;
             float head = 0f;
             int i = 0;
-            foreach (Weapon weapon in weaponList) {
+            foreach (Weapon weapon in pd.weaponList) {
                 if (!float.IsNaN(weapon.hitPercent)) {
                     hit += weapon.hitPercent;
                     if (!float.IsNaN(weapon.headHitPercent)) head += weapon.headHitPercent;
