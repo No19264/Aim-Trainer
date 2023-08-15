@@ -7,6 +7,7 @@ using TMPro;
 
 public class GameUI : MonoBehaviour
 {
+    [SerializeField] PlayerData pd;
     [SerializeField] GunBehaviour gb;
     [SerializeField] GameObject escScreen;
     [Space]
@@ -19,8 +20,6 @@ public class GameUI : MonoBehaviour
     [Space]
     [SerializeField] TextMeshProUGUI weaponHitText;
     [SerializeField] TextMeshProUGUI weaponHeadText;
-    [SerializeField] TextMeshProUGUI totalHitText;
-    [SerializeField] TextMeshProUGUI totalHeadText;
 
     void Start()
     {
@@ -45,12 +44,8 @@ public class GameUI : MonoBehaviour
         ammoText.text = "" + gb.GetAmmoCount;
         clipText.text = "" + gb.GetClipSize;
 
-        float[] weaponAccuracy = gb.GetWeaponAccuracy;
-        float[] totalAccuracy = gb.GetTotalAccuracy;
-        weaponHitText.text = "Hit: " + weaponAccuracy[0] + "%";
-        weaponHeadText.text = "Headshot: " + weaponAccuracy[1] + "%";
-        totalHitText.text = "Hit: " + totalAccuracy[0] + "%";
-        totalHeadText.text = "Headshot: " + totalAccuracy[1] + "%";
+        weaponHitText.text = "Hit: " + pd.roundData.accuracy.HitPercent + "%";
+        weaponHeadText.text = "Headshot: " + pd.roundData.accuracy.HeadHitPercent + "%";
     }
 
     public void UpdateEquipedIcon(int index)

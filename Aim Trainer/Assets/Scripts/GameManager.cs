@@ -6,15 +6,26 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] float roundLength;
+    [SerializeField] PlayerData pd;
+    [SerializeField] GunBehaviour gb;
     [SerializeField] DoorBehaviour entryDoor;
     [SerializeField] SpawnManager spawner;
     [SerializeField] TextMeshProUGUI timeText;
     [SerializeField] GameObject interactText;
+    public Round roundData;
     public bool canStart = true;
+    public int eliminations = 0;
     
-    bool playing = false;
-    float timer = 0f;
+    public bool playing;
+    float timer;
+    int roundNumber;
+
+    void Start()
+    {
+        playing = false;
+        timer = 0f;
+        roundNumber = 0;
+    }
 
     // Update is called once per frame
     void Update()
@@ -41,11 +52,11 @@ public class GameManager : MonoBehaviour
         if (!playing && canStart) {
             Debug.Log("Round has started");
             playing = true;
-            timer = roundLength;
+            timer = pd.roundTime;
+            pd.RefreshRoundData(gb.weaponIndex);
             spawner.StartSpawning();
             entryDoor.LockDoor();
         }
-        
     }
 
     public void StopGame()
@@ -54,6 +65,8 @@ public class GameManager : MonoBehaviour
             Debug.Log("Round has ended");
             playing = false;
             timer = 0;
+            roundNumber += 1;
+            pd.ApplyRoundData();
             spawner.StopSpawning();
             entryDoor.UnlockDoor();
         }

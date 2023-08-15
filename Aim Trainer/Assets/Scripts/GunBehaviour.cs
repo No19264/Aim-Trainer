@@ -6,6 +6,7 @@ using UnityEngine;
 public class GunBehaviour : MonoBehaviour
 {
     [SerializeField] PlayerData pd;
+    [SerializeField] GameManager gm;
     [SerializeField] GameObject mainCamera;
     [SerializeField] Animator gunAnim;
     [SerializeField] Animator gunPosAnim;
@@ -25,7 +26,7 @@ public class GunBehaviour : MonoBehaviour
     [SerializeField] GameObject SniperScreen;
 
     CameraBehaviour cameraScript;
-    int weaponIndex = 999;
+    [HideInInspector] public int weaponIndex = 999;
     float timeToNextShot;
     bool aiming;
     bool reloading;
@@ -102,13 +103,14 @@ public class GunBehaviour : MonoBehaviour
             // Damage the enemy if they are hit
             if (hit.collider.tag == "Body") { 
                 hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(pd.weaponList[weaponIndex].damage);
-                pd.weaponList[weaponIndex].hitCount += 1;
+                if (gm.playing) pd.roundData.accuracy.hitCount += 1;
                 rm.CreateHitMarker();
             }
             if (hit.collider.tag == "Head") {
                 hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(pd.weaponList[weaponIndex].damage * 1.5f);
-                pd.weaponList[weaponIndex].hitCount += 1;
-                pd.weaponList[weaponIndex].headHitCount += 1;
+                if (gm.playing) 
+                    pd.roundData.accuracy.hitCount += 1;
+                    pd.roundData.accuracy.headHitCount += 1;
                 rm.CreateHitMarker(true);
             }
         } else {
@@ -119,7 +121,7 @@ public class GunBehaviour : MonoBehaviour
         Instantiate(pd.weaponList[weaponIndex].bullet, barrelTransformList[weaponIndex].position, Quaternion.LookRotation(point - barrelTransformList[weaponIndex].position));
         mainCamera.GetComponent<CameraBehaviour>().ApplyRecoil(pd.weaponList[weaponIndex].recoil);
         pd.weaponList[weaponIndex].currentAmmo -= 1;
-        pd.weaponList[weaponIndex].shotCount += 1;
+        if (gm.playing) pd.roundData.accuracy.shotCount += 1;
 
         // Play gun animation
         if (weaponIndex == 0) gunAnim.SetTrigger("pistolShoot");
@@ -206,38 +208,5 @@ public class GunBehaviour : MonoBehaviour
 
     public int GetClipSize {
         get {return (weaponIndex != 999) ? pd.weaponList[weaponIndex].clipSize : 0;}
-    }
-
-    // Returns the accuracy decimal to 2DP is it is not NaN (Not A Number)
-    public float[] GetWeaponAccuracy {
-        get{
-            if (weaponIndex != 999) {
-                float first = (!float.IsNaN(pd.weaponList[weaponIndex].hitPercent)) ? pd.weaponList[weaponIndex].hitPercent: 0f;
-                float second = (!float.IsNaN(pd.weaponList[weaponIndex].headHitPercent)) ? pd.weaponList[weaponIndex].headHitPercent : 0f;
-                return new float[] {first, second};
-            } else {
-                return new float[] {0f, 0f};
-            }
-        }
-    }
-
-    // Finds the mean accuracy of all of the weapons (ignores NaN's)
-    public float[] GetTotalAccuracy {
-        get{
-            float hit = 0f;
-            float head = 0f;
-            int i = 0;
-            foreach (Weapon weapon in pd.weaponList) {
-                if (!float.IsNaN(weapon.hitPercent)) {
-                    hit += weapon.hitPercent;
-                    if (!float.IsNaN(weapon.headHitPercent)) head += weapon.headHitPercent;
-                    i += 1;
-                } 
-            }
-            float first = (hit != 0) ? Mathf.Round(hit / (float)i * 10f) / 10f : 0f;
-            float second = (hit != 0) ? Mathf.Round(head / (float)i * 10f) / 10f : 0f;
-            float[] accuracy = new float[] {first, second};
-            return accuracy;
-        }
     }
 }

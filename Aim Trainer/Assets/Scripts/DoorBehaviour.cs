@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class DoorBehaviour : MonoBehaviour
 {
-
+    [SerializeField] GunBehaviour gb;
     [SerializeField] GameObject target;
     [SerializeField] float detectRange;
+    [SerializeField] bool requiresWeapon;
     Animator animator;
     bool lastStateOpen;
     bool locked;
@@ -22,9 +23,11 @@ public class DoorBehaviour : MonoBehaviour
     {
         if (!locked) {
             if (Vector3.Distance(transform.position, target.transform.position) < detectRange) {
-                if (!lastStateOpen) {
-                    animator.SetTrigger("Open");
-                    lastStateOpen = true;
+                if ((requiresWeapon && gb.weaponIndex != 999) || !requiresWeapon) {
+                    if (!lastStateOpen) {
+                        animator.SetTrigger("Open");
+                        lastStateOpen = true;
+                    }
                 }
             } else {
                 if (lastStateOpen) {
