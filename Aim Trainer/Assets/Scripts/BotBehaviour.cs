@@ -11,7 +11,7 @@ public class BotBehaviour : MonoBehaviour
 
     Rigidbody rb;
     Animator anim;
-    float health;
+    public float health;
     bool moving = true;
     int crouchState = 0;
     float distanceTravelled = 0;

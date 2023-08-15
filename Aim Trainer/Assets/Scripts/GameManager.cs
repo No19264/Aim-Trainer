@@ -50,7 +50,6 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         if (!playing && canStart) {
-            Debug.Log("Round has started");
             playing = true;
             timer = pd.roundTime;
             pd.RefreshRoundData(gb.weaponIndex);
@@ -62,7 +61,6 @@ public class GameManager : MonoBehaviour
     public void StopGame()
     {
         if (playing) {
-            Debug.Log("Round has ended");
             playing = false;
             timer = 0;
             roundNumber += 1;

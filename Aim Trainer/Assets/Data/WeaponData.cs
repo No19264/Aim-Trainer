@@ -44,6 +44,7 @@ public class Round
     public Accuracy accuracy;
 
     public int spawnRange;
+    public int eliminations;
     public float botSpeed;
     public float roundTime;
 
@@ -56,5 +57,6 @@ public class Round
         accuracy.shotCount = 0;
         accuracy.hitCount = 0;
         accuracy.headHitCount = 0;
+        eliminations = 0;
     }
 }

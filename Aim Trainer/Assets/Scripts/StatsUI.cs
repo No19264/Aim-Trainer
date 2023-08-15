@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class StatsUI : MonoBehaviour
@@ -10,9 +11,11 @@ public class StatsUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI[] pistolText;
     [SerializeField] TextMeshProUGUI[] rifleText;
     [SerializeField] TextMeshProUGUI[] sniperText;
+    [SerializeField] Image[] medalImages;
 
     public void LoadData()
     {
+        // Text
         switch (pd.roundData.weaponIndex) {
             case 0:
                 weaponAccuracyText[0].text = "PISTOL";
@@ -34,5 +37,10 @@ public class StatsUI : MonoBehaviour
         rifleText[1].text = pd.totalRifleAccuracy.HeadHitPercent.ToString();
         sniperText[0].text = pd.totalSniperAccuracy.HitPercent.ToString();
         sniperText[1].text = pd.totalSniperAccuracy.HeadHitPercent.ToString();
+
+        // Medals
+        for (int i=0; i < medalImages.Length; i++) {
+            medalImages[i].color = pd.GetMedalColour(i);
+        }
     }
 }

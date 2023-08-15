@@ -75,6 +75,9 @@ public class SettingsManager : MonoBehaviour
         pd.botSpeed = Mathf.Round(sliders[6].value * 0.1f);
         pd.spawnRange = (int) Mathf.Round(sliders[7].value);
         pd.roundTime = Mathf.Round(sliders[8].value);
+        weaponStats[currentWeaponIndex].damage = Mathf.Round(sliders[9].value);
+        weaponStats[currentWeaponIndex].clipSize = (int) Mathf.Round(sliders[10].value);
+        weaponStats[currentWeaponIndex].recoil = Mathf.Round(sliders[11].value);
         pd.weaponList = weaponStats;
         pd.constantSpawnRange = rangeToggle.isOn;
     }

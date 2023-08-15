@@ -7,7 +7,6 @@ public class SniperFX : MonoBehaviour
     [SerializeField] GunBehaviour gb;
 
     public void DisplaySniperScreen() {
-        Debug.Log("Done");
         gb.SniperAimEffects();
     }
 }

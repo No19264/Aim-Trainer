@@ -16,33 +16,33 @@ MonoBehaviour:
   groundDrag: 5
   jumpPower: 7
   descendingGravityForce: 3
-  horizontalSensitivity: 500
-  verticalSensitivity: 500
+  horizontalSensitivity: 300
+  verticalSensitivity: 300
   weaponList:
   - name: PISTOL
-    damage: 20
+    damage: 100
     clipSize: 12
     rpm: 120
-    recoil: 5
+    recoil: 0
     range: 100
     bullet: {fileID: 25043611852771336, guid: 342e295dcbd0c3b44b884ae001db3699, type: 3}
-    currentAmmo: 0
+    currentAmmo: 12
   - name: RIFLE
     damage: 15
     clipSize: 60
     rpm: 240
-    recoil: 2
+    recoil: 0
     range: 100
     bullet: {fileID: 25043611852771336, guid: 619e9a22fcfcfc742828649232a929b1, type: 3}
     currentAmmo: 59
   - name: SNIPER
     damage: 80
     clipSize: 4
-    rpm: 30
-    recoil: 15
+    rpm: 45
+    recoil: 0
     range: 200
     bullet: {fileID: 25043611852771336, guid: 342e295dcbd0c3b44b884ae001db3699, type: 3}
-    currentAmmo: 4
+    currentAmmo: 3
   permAccuracy:
   - 0
   - 0
@@ -52,26 +52,33 @@ MonoBehaviour:
   - 0
   botSpeed: 5
   constantSpawnRange: 0
-  spawnRange: 0
+  spawnRange: 3
   roundTime: 20
   totalPistolAccuracy:
-    shotCount: 0
-    hitCount: 0
-    headHitCount: 0
+    shotCount: 79
+    hitCount: 44
+    headHitCount: 28
   totalRifleAccuracy:
     shotCount: 0
     hitCount: 0
     headHitCount: 0
   totalSniperAccuracy:
-    shotCount: 0
-    hitCount: 0
-    headHitCount: 0
+    shotCount: 15
+    hitCount: 6
+    headHitCount: 6
   roundData:
-    weaponIndex: 0
+    weaponIndex: 2
     accuracy:
-      shotCount: 0
-      hitCount: 0
-      headHitCount: 0
-    spawnRange: 0
-    botSpeed: 0
-    roundTime: 0
+      shotCount: 8
+      hitCount: 4
+      headHitCount: 4
+    spawnRange: 3
+    eliminations: 4
+    botSpeed: 5
+    roundTime: 20
+  medalData: 01000000030000000100000002000000
+  medalColours:
+  - {r: 0, g: 0, b: 0, a: 0.5882353}
+  - {r: 0.6415094, g: 0.37170953, b: 0.2142399, a: 1}
+  - {r: 0.509434, g: 0.509434, b: 0.509434, a: 1}
+  - {r: 0.8679245, g: 0.79649055, b: 0.23253822, a: 1}

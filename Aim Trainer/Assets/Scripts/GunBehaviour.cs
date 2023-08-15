@@ -99,15 +99,17 @@ public class GunBehaviour : MonoBehaviour
         Vector3 point;
         if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out hit, pd.weaponList[weaponIndex].range, raycastIgnore)) {
             point = hit.point;
-            
+            BotBehaviour botHit = hit.collider.transform.root.GetComponent<BotBehaviour>();
             // Damage the enemy if they are hit
             if (hit.collider.tag == "Body") { 
-                hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(pd.weaponList[weaponIndex].damage);
+                if (botHit.health <= pd.weaponList[weaponIndex].damage) pd.roundData.eliminations += 1;
+                botHit.DamageBot(pd.weaponList[weaponIndex].damage);
                 if (gm.playing) pd.roundData.accuracy.hitCount += 1;
                 rm.CreateHitMarker();
             }
             if (hit.collider.tag == "Head") {
-                hit.collider.transform.root.GetComponent<BotBehaviour>().DamageBot(pd.weaponList[weaponIndex].damage * 1.5f);
+                if (botHit.health <= pd.weaponList[weaponIndex].damage * 1.5f) pd.roundData.eliminations += 1;
+                botHit.DamageBot(pd.weaponList[weaponIndex].damage * 1.5f);
                 if (gm.playing) 
                     pd.roundData.accuracy.hitCount += 1;
                     pd.roundData.accuracy.headHitCount += 1;
