@@ -16,19 +16,7 @@ public class StatsUI : MonoBehaviour
     public void LoadData()
     {
         // Text
-        switch (pd.roundData.weaponIndex) {
-            case 0:
-                weaponAccuracyText[0].text = "PISTOL";
-                break;
-            case 1:
-                weaponAccuracyText[0].text = "RIFLE";
-                break;
-            case 2:
-                weaponAccuracyText[0].text = "SNIPER";
-                break;
-            default:
-                break;
-        }
+        weaponAccuracyText[0].text = pd.IndexToWeaponName(pd.roundData.weaponIndex);
         weaponAccuracyText[1].text = pd.roundData.accuracy.HitPercent.ToString();
         weaponAccuracyText[2].text = pd.roundData.accuracy.HeadHitPercent.ToString();
         pistolText[0].text = pd.totalPistolAccuracy.HitPercent.ToString();

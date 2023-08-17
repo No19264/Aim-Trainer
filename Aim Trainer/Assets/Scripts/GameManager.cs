@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] DoorBehaviour entryDoor;
     [SerializeField] SpawnManager spawner;
     [SerializeField] TextMeshProUGUI timeText;
-    [SerializeField] GameObject interactText;
+    [SerializeField] TextMeshProUGUI interactText;
     public Round roundData;
     public bool canStart = true;
     public int eliminations = 0;
@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public bool playing;
     float timer;
     int roundNumber;
+    public bool selectedWeapon = false;
 
     void Start()
     {
@@ -72,11 +73,20 @@ public class GameManager : MonoBehaviour
 
     public void ToggleInteractText(bool on)
     {
-        if (on) {
-            interactText.SetActive(true);
+        if (selectedWeapon) {
+            if (on) {
+                interactText.gameObject.SetActive(true);
+            } else {
+                interactText.gameObject.SetActive(false);
+            }
         } else {
-            interactText.SetActive(false);
+            if (on) {
+                interactText.text = "PRESS F TO SWITCH TO WEAPON";
+            } else {
+                interactText.text = "SELECT WEAPON TO ENTER ARENA";
+            }
         }
+        
     }
 
     public bool IsPlaying {

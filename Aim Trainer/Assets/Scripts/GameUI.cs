@@ -18,8 +18,9 @@ public class GameUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI ammoText;
     [SerializeField] TextMeshProUGUI clipText;
     [Space]
-    [SerializeField] TextMeshProUGUI weaponHitText;
-    [SerializeField] TextMeshProUGUI weaponHeadText;
+    [SerializeField] TextMeshProUGUI[] weaponText;
+    [SerializeField] TextMeshProUGUI[] weaponHitText;
+    [SerializeField] TextMeshProUGUI[] weaponHeadText;
 
     void Start()
     {
@@ -44,8 +45,9 @@ public class GameUI : MonoBehaviour
         ammoText.text = "" + gb.GetAmmoCount;
         clipText.text = "" + gb.GetClipSize;
 
-        weaponHitText.text = "Hit: " + pd.roundData.accuracy.HitPercent + "%";
-        weaponHeadText.text = "Headshot: " + pd.roundData.accuracy.HeadHitPercent + "%";
+        weaponText[0].text = weaponText[1].text = pd.IndexToWeaponName(pd.roundData.weaponIndex);
+        weaponHitText[0].text = weaponHitText[1].text = "HIT: " + pd.roundData.accuracy.HitPercent + "%";
+        weaponHeadText[0].text = weaponHeadText[1].text = "HEADSHOT: " + pd.roundData.accuracy.HeadHitPercent + "%";
     }
 
     public void UpdateEquipedIcon(int index)

@@ -20,6 +20,7 @@ public class WeaponSelect : MonoBehaviour
         // Disables the selected weapon model
         foreach (GameObject model in weaponModels) model.SetActive(true);
         if (index < weaponModels.Length) weaponModels[index].SetActive(false);
+        gameManager.selectedWeapon = true;
         // Switches the weapon
         gunScript.SwitchToWeapon(index);
     }

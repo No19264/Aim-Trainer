@@ -51,15 +51,13 @@ public class GunBehaviour : MonoBehaviour
                         ShootBullet();
                         timeToNextShot = 60 / pd.weaponList[weaponIndex].rpm;
                     } else {
-                        // Flash the ammo screen
+                        Reload();
                     }
                 }
 
                 // Reloading
                 if (Input.GetKeyDown(KeyCode.R)) {
-                    reloading = true;
-                    DoReloadSuspension();
-                    gunAnim.SetTrigger("reload");
+                    Reload();
                 }
 
                 // Aiming 
@@ -134,6 +132,13 @@ public class GunBehaviour : MonoBehaviour
         gu.UpdateText();
     }
 
+    void Reload()
+    {
+        reloading = true;
+        DoReloadSuspension();
+        gunAnim.SetTrigger("reload");
+    }
+
     // Switch weapon stats, what parts are displayed, if the weapon index exists
     public void SwitchToWeapon(int index = 999)
     {
@@ -185,6 +190,8 @@ public class GunBehaviour : MonoBehaviour
                 fullGun.SetActive(false);
             }
         }
+        // Restore Ammo
+        if (index != 999) pd.weaponList[weaponIndex].currentAmmo = pd.weaponList[weaponIndex].clipSize;
     }
 
     public void SniperAimEffects()

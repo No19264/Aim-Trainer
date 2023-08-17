@@ -187,4 +187,23 @@ public class PlayerData : ScriptableObject
     {
         return medalColours[medalData[medalIndex]];
     }
+
+    public string IndexToWeaponName(int i) 
+    {
+        string name = "<No Weapon>";
+        switch (i) {
+            case 0:
+                name = "PISTOL";
+                break;
+            case 1:
+                name = "RIFLE";
+                break;
+            case 2:
+                name = "SNIPER";
+                break;
+            default:
+                break;
+        }
+        return name;
+    }
 }

@@ -31,7 +31,7 @@ public class Accuracy
     
     public float HeadHitPercent {
         get {
-            return shotCount > 0 ? Mathf.Round(((float)headHitCount / (float)hitCount) * 1000f) / 10f : 0f;
+            return hitCount > 0 ? Mathf.Round(((float)headHitCount / (float)hitCount) * 1000f) / 10f : 0f;
         }
     }
 }
