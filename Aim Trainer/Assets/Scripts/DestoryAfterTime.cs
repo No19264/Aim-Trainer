@@ -10,6 +10,7 @@ public class DestoryAfterTime : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Destory after time is up
         if (time < lifeTime) time += Time.deltaTime;
         else Destroy(gameObject);
     }

@@ -7,8 +7,8 @@ using TMPro;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] PlayerData pd;
-    [SerializeField] GunBehaviour gb;
+    [SerializeField] PlayerData playerData;
+    [SerializeField] GunBehaviour gunBehaviour;
     [SerializeField] GameObject escScreen;
     [Space]
     [SerializeField] GameObject noGunText;
@@ -39,17 +39,18 @@ public class GameUI : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    // Set text values when called
     public void UpdateText()
     {
-        ammoText.text = "" + gb.GetAmmoCount;
-        clipText.text = "" + gb.GetClipSize;
+        ammoText.text = "" + gunBehaviour.GetAmmoCount;
+        clipText.text = "" + gunBehaviour.GetClipSize;
 
-        weaponText[0].text = weaponText[1].text = pd.IndexToWeaponName(pd.roundData.weaponIndex);
-        weaponHitText[0].text = weaponHitText[1].text = "HIT: " + pd.roundData.accuracy.HitPercent + "%";
-        weaponHeadText[0].text = weaponHeadText[1].text = "HEADSHOT: " + pd.roundData.accuracy.HeadHitPercent + "%";
+        weaponText[0].text = weaponText[1].text = playerData.IndexToWeaponName(playerData.roundData.weaponIndex);
+        weaponHitText[0].text = weaponHitText[1].text = "HIT: " + playerData.roundData.accuracy.HitPercent + "%";
+        weaponHeadText[0].text = weaponHeadText[1].text = "HEADSHOT: " + playerData.roundData.accuracy.HeadHitPercent + "%";
     }
 
+    // Change selected weapon icon when called
     public void UpdateEquipedIcon(int index)
     {
         switch (index) {
@@ -75,6 +76,7 @@ public class GameUI : MonoBehaviour
         }
     }
 
+    // Continue the game if paused
     public void ContinueButton() 
     {
         escScreen.SetActive(false);
@@ -83,6 +85,7 @@ public class GameUI : MonoBehaviour
         Cursor.visible = false;
     }
 
+    // Exit the arena
     public void LeaveButton()
     {
         Time.timeScale = 1f;

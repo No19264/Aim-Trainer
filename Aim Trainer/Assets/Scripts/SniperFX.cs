@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class SniperFX : MonoBehaviour
 {
-    [SerializeField] GunBehaviour gb;
+    [SerializeField] GunBehaviour gunBehaviour;
 
+    // Used in animation - Just triggers gunBehaviour function
     public void DisplaySniperScreen() {
-        gb.SniperAimEffects();
+        if (gunBehaviour.aiming) gunBehaviour.SniperAimEffects();
     }
 }

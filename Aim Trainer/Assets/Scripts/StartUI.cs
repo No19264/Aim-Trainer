@@ -10,6 +10,7 @@ public class StartUI : MonoBehaviour
     [SerializeField] GameObject settingsScreen; 
     Animator animator;
 
+    // Initialise
     void Start() 
     {
         animator = GetComponent<Animator>();
@@ -17,11 +18,13 @@ public class StartUI : MonoBehaviour
 
     void Update()
     {
+        // When escape pressed to back to home page
         if (Input.GetKeyDown(KeyCode.Escape)) {
             BackButton();
         }
     }
 
+    // Takes in a canvas object as a parameter, and hides all other screens
     void toggleScreen(GameObject screen) 
     {
         // Hide all tabs
@@ -33,7 +36,7 @@ public class StartUI : MonoBehaviour
         screen.SetActive(true);
     }
 
-    // Menu Buttons
+    // --------------- Menu Buttons
     public void StartButton() 
     {
         animator.SetTrigger("Page Down");
@@ -57,7 +60,7 @@ public class StartUI : MonoBehaviour
         Application.Quit();
     }
 
-    // Screen Buttons
+    // ------------------------Screen Buttons
     public void BackButton()
     {
         animator.SetTrigger("Page Up");

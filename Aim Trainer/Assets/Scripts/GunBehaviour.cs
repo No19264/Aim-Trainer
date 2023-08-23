@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class GunBehaviour : MonoBehaviour
 {
-    [SerializeField] PlayerData pd;
-    [SerializeField] GameManager gm;
+    [SerializeField] PlayerData playerData;
+    [SerializeField] GameManager gameManager;
     [SerializeField] GameObject mainCamera;
     [SerializeField] Animator gunAnim;
     [SerializeField] Animator gunPosAnim;
     [SerializeField] Transform[] barrelTransformList;
     [SerializeField] LayerMask raycastIgnore;
-    [SerializeField] RecticleManager rm;
-    [SerializeField] GameUI gu;
+    [SerializeField] RecticleManager recticleManager;
+    [SerializeField] GameUI gameUI;
     [Space]
     [SerializeField] GameObject fullGun;
     [SerializeField] GameObject rifleAttachment;
@@ -28,9 +28,10 @@ public class GunBehaviour : MonoBehaviour
     CameraBehaviour cameraScript;
     [HideInInspector] public int weaponIndex = 999;
     float timeToNextShot;
-    bool aiming;
+    public bool aiming;
     bool reloading;
     
+    // Initialising variables
     void Awake()
     {
         cameraScript = mainCamera.GetComponent<CameraBehaviour>();
@@ -41,15 +42,16 @@ public class GunBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // When weaponIndex == 999, no weapon is selected
         if (weaponIndex != 999)
         {
             if (!reloading) {
                 // Shoot when left click
                 if (Input.GetMouseButton(0) && timeToNextShot <= 0)
                 {
-                    if (pd.weaponList[weaponIndex].currentAmmo > 0) {
+                    if (playerData.weaponList[weaponIndex].currentAmmo > 0) {
                         ShootBullet();
-                        timeToNextShot = 60 / pd.weaponList[weaponIndex].rpm;
+                        timeToNextShot = 60 / playerData.weaponList[weaponIndex].rpm;
                     } else {
                         Reload();
                     }
@@ -60,7 +62,7 @@ public class GunBehaviour : MonoBehaviour
                     Reload();
                 }
 
-                // Aiming 
+                // Aim on right click 
                 if (Input.GetMouseButtonDown(1)) {
                     aiming = true;
                     gunPosAnim.SetBool("Aiming", true);
@@ -69,16 +71,17 @@ public class GunBehaviour : MonoBehaviour
                         cameraScript.ScaleCameraSensitivity(1f - (float)(weaponIndex + 1) * 0.1f);
                     }
                 }
+                // Stop aiming on release of Right click
                 if (Input.GetMouseButtonUp(1)) { 
                     ResetAiming();
                 }
-
             }
             // Time down the shot timer
             if (timeToNextShot > 0) timeToNextShot -= Time.deltaTime;
         }
     }
 
+    // Reset back to normal state
     void ResetAiming()
     {
         aiming = false;
@@ -95,33 +98,34 @@ public class GunBehaviour : MonoBehaviour
         // Cast the ray
         RaycastHit hit;
         Vector3 point;
-        if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out hit, pd.weaponList[weaponIndex].range, raycastIgnore)) {
+        if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out hit, playerData.weaponList[weaponIndex].range, raycastIgnore)) {
             point = hit.point;
             BotBehaviour botHit = hit.collider.transform.root.GetComponent<BotBehaviour>();
-            // Damage the enemy if they are hit
+            
+            // Damage the enemy if they are hit and add the data of the shot to playerData
             if (hit.collider.tag == "Body") { 
-                if (botHit.health <= pd.weaponList[weaponIndex].damage) pd.roundData.eliminations += 1;
-                botHit.DamageBot(pd.weaponList[weaponIndex].damage);
-                if (gm.playing) pd.roundData.accuracy.hitCount += 1;
-                rm.CreateHitMarker();
+                if (botHit.health <= playerData.weaponList[weaponIndex].damage) playerData.roundData.eliminations += 1;
+                botHit.DamageBot(playerData.weaponList[weaponIndex].damage);
+                if (gameManager.playing) playerData.roundData.accuracy.hitCount += 1;
+                recticleManager.CreateHitMarker();
             }
             if (hit.collider.tag == "Head") {
-                if (botHit.health <= pd.weaponList[weaponIndex].damage * 1.5f) pd.roundData.eliminations += 1;
-                botHit.DamageBot(pd.weaponList[weaponIndex].damage * 1.5f);
-                if (gm.playing) 
-                    pd.roundData.accuracy.hitCount += 1;
-                    pd.roundData.accuracy.headHitCount += 1;
-                rm.CreateHitMarker(true);
+                if (botHit.health <= playerData.weaponList[weaponIndex].damage * 1.5f) playerData.roundData.eliminations += 1;
+                botHit.DamageBot(playerData.weaponList[weaponIndex].damage * 1.5f);
+                if (gameManager.playing) 
+                    playerData.roundData.accuracy.hitCount += 1;
+                    playerData.roundData.accuracy.headHitCount += 1;
+                recticleManager.CreateHitMarker(true);
             }
         } else {
-            point = mainCamera.transform.forward * pd.weaponList[weaponIndex].range + mainCamera.transform.position;
+            point = mainCamera.transform.forward * playerData.weaponList[weaponIndex].range + mainCamera.transform.position;
         }
         
         // Spawn the bullet visual, apply recoil and reduce ammo
-        Instantiate(pd.weaponList[weaponIndex].bullet, barrelTransformList[weaponIndex].position, Quaternion.LookRotation(point - barrelTransformList[weaponIndex].position));
-        mainCamera.GetComponent<CameraBehaviour>().ApplyRecoil(pd.weaponList[weaponIndex].recoil);
-        pd.weaponList[weaponIndex].currentAmmo -= 1;
-        if (gm.playing) pd.roundData.accuracy.shotCount += 1;
+        Instantiate(playerData.weaponList[weaponIndex].bullet, barrelTransformList[weaponIndex].position, Quaternion.LookRotation(point - barrelTransformList[weaponIndex].position));
+        mainCamera.GetComponent<CameraBehaviour>().ApplyRecoil(playerData.weaponList[weaponIndex].recoil);
+        playerData.weaponList[weaponIndex].currentAmmo -= 1;
+        if (gameManager.playing) playerData.roundData.accuracy.shotCount += 1;
 
         // Play gun animation
         if (weaponIndex == 0) gunAnim.SetTrigger("pistolShoot");
@@ -129,9 +133,10 @@ public class GunBehaviour : MonoBehaviour
         else if (weaponIndex == 2) gunAnim.SetTrigger("sniperShoot");
 
         // Update Text
-        gu.UpdateText();
+        gameUI.UpdateText();
     }
 
+    // Play reload animation
     void Reload()
     {
         reloading = true;
@@ -143,10 +148,10 @@ public class GunBehaviour : MonoBehaviour
     public void SwitchToWeapon(int index = 999)
     {
         if (!aiming) {
-            gu.UpdateEquipedIcon(index);
+            gameUI.UpdateEquipedIcon(index);
             if (index != 999) {
-                // Check to see if the weapon is in pd.weaponList
-                if (index < pd.weaponList.Length) {
+                // Check to see if the weapon is in playerData.weaponList
+                if (index < playerData.weaponList.Length) {
                     // Check to see if you are not already selecting weapon
                     if (weaponIndex != index) {
                         // Change weapon stats
@@ -182,18 +187,19 @@ public class GunBehaviour : MonoBehaviour
                                 Debug.Log("Gun model gameobject not callibrated");
                                 break;
                         }
+                        // Restore Ammo
+                        playerData.weaponList[weaponIndex].currentAmmo = playerData.weaponList[weaponIndex].clipSize;
                     }
                 } else Debug.Log("Weapon Index does not exist");
-                gu.UpdateText();
+                gameUI.UpdateText();
             } else {
                 weaponIndex = 999;
                 fullGun.SetActive(false);
             }
         }
-        // Restore Ammo
-        if (index != 999) pd.weaponList[weaponIndex].currentAmmo = pd.weaponList[weaponIndex].clipSize;
     }
 
+    // Special sniper effects when aiming
     public void SniperAimEffects()
     {
         cameraScript.SetFOV(35f); 
@@ -202,20 +208,21 @@ public class GunBehaviour : MonoBehaviour
         SniperScreen.SetActive(true);
     }
 
+    // Used to time the refilling of ammo with the animation
     async void DoReloadSuspension() 
     {
         ResetAiming();
         await Task.Delay(1500);
-        pd.weaponList[weaponIndex].currentAmmo = pd.weaponList[weaponIndex].clipSize;
+        playerData.weaponList[weaponIndex].currentAmmo = playerData.weaponList[weaponIndex].clipSize;
         reloading = false;
-        gu.UpdateText();
+        gameUI.UpdateText();
     }
 
     public int GetAmmoCount {
-        get {return (weaponIndex != 999) ? pd.weaponList[weaponIndex].currentAmmo : 0;}
+        get {return (weaponIndex != 999) ? playerData.weaponList[weaponIndex].currentAmmo : 0;}
     }
 
     public int GetClipSize {
-        get {return (weaponIndex != 999) ? pd.weaponList[weaponIndex].clipSize : 0;}
+        get {return (weaponIndex != 999) ? playerData.weaponList[weaponIndex].clipSize : 0;}
     }
 }

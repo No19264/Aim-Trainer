@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BotBehaviour : MonoBehaviour
 {
-    [SerializeField] PlayerData pd;
+    [SerializeField] PlayerData playerData;
     [Space]
     [SerializeField] float maxDistance;
     [SerializeField] float rotationSpeed;
@@ -17,13 +17,15 @@ public class BotBehaviour : MonoBehaviour
     float distanceTravelled = 0;
     Vector3 posLastFrame;
 
-    // Start is called before the first frame update
+    // Initialise Settings
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         health = 100f;
         crouchState = Random.Range(0, 4);
+        
+        // Randomise whether bot is running or crouching
         anim.SetBool("Crouched", (crouchState == 0) ? true : false);
         anim.SetBool("Moving", moving);
         posLastFrame = transform.position;
@@ -34,7 +36,7 @@ public class BotBehaviour : MonoBehaviour
     {
         // Make the bot move slower if crouching (crouching when crouchstate == 0)
         float speedMultiplier = (crouchState == 0) ? 1f : 0f;
-        rb.velocity = transform.forward * (pd.botSpeed - (pd.botSpeed * 0.3f * speedMultiplier));
+        rb.velocity = transform.forward * (playerData.botSpeed - (playerData.botSpeed * 0.3f * speedMultiplier));
 
         // Measure the distance the bot has walked. Destory bot once travelled that distance
         distanceTravelled += Mathf.Abs((transform.position - posLastFrame).magnitude);
@@ -51,6 +53,7 @@ public class BotBehaviour : MonoBehaviour
         */
     }
 
+    // Damage the target
     public void DamageBot(float damage) 
     {
         health -= damage;

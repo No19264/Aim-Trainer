@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DoorBehaviour : MonoBehaviour
 {
-    [SerializeField] GunBehaviour gb;
+    [SerializeField] GunBehaviour gunBehaviour;
     [SerializeField] GameObject target;
     [SerializeField] float detectRange;
     [SerializeField] bool requiresWeapon;
@@ -12,7 +12,7 @@ public class DoorBehaviour : MonoBehaviour
     bool lastStateOpen;
     bool locked;
 
-    // Start is called before the first frame update
+    // Initiailise Variables
     void Awake()
     {
         animator = GetComponent<Animator>();
@@ -21,9 +21,11 @@ public class DoorBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Open the door if the player is close enough and the door isn't locked
+        // lastStateOpen ensures that animation only fires once
         if (!locked) {
             if (Vector3.Distance(transform.position, target.transform.position) < detectRange) {
-                if ((requiresWeapon && gb.weaponIndex != 999) || !requiresWeapon) {
+                if ((requiresWeapon && gunBehaviour.weaponIndex != 999) || !requiresWeapon) {
                     if (!lastStateOpen) {
                         animator.SetTrigger("Open");
                         lastStateOpen = true;
@@ -38,12 +40,14 @@ public class DoorBehaviour : MonoBehaviour
         }
     }
 
+    // Lock the door (for other gameObjects to use)
     public void LockDoor()
     {
         animator.SetTrigger("Close");
         locked = true;
     }
 
+    // Unlock the door (for other gameObjects to use)
     public void UnlockDoor()
     {
         locked = false;

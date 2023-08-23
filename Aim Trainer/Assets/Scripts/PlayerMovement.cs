@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] PlayerData pd;
+    [SerializeField] PlayerData playerData;
     [SerializeField] GameObject groundCheck;
     [SerializeField] Transform orientation;
     [SerializeField] Animator cameraAnim;
@@ -21,6 +21,7 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        jumps = maxJumpCount;
     }
 
     // Update is called once per frame
@@ -36,14 +37,14 @@ public class PlayerMovement : MonoBehaviour
         
         // Horizontal Movement Constraints
         Vector3 HVelocity = new Vector3(moveDirection.x, 0f, moveDirection.z);
-        if (HVelocity.magnitude > pd.playerSpeed) {
+        if (HVelocity.magnitude > playerData.playerSpeed) {
             HVelocity = HVelocity.normalized;
-            rb.velocity = new Vector3(HVelocity.x * pd.playerSpeed, rb.velocity.y, HVelocity.z * pd.playerSpeed);
+            rb.velocity = new Vector3(HVelocity.x * playerData.playerSpeed, rb.velocity.y, HVelocity.z * playerData.playerSpeed);
         }
         
         // Jumping
         if (Input.GetKeyDown(KeyCode.Space) && jumps > 0) {
-            rb.AddForce(Vector3.up * pd.jumpPower, ForceMode.Impulse);
+            rb.AddForce(Vector3.up * playerData.jumpPower, ForceMode.Impulse);
             jumps -= 1;
         }
 
@@ -52,7 +53,7 @@ public class PlayerMovement : MonoBehaviour
         if (rb.velocity.y < 0.1f && !isGrounded)
         {
             if (rb.velocity.y < -20f) rb.velocity = new Vector3(rb.velocity.x, -20f, rb.velocity.z); 
-            else rb.AddForce(Vector3.down * pd.descendingGravityForce);
+            else rb.AddForce(Vector3.down * playerData.descendingGravityForce);
         }
 
         // Crouching
@@ -62,17 +63,19 @@ public class PlayerMovement : MonoBehaviour
 
         // Ground conditionals
         if (isGrounded) {
-            rb.drag = pd.groundDrag;
-            jumps = maxJumpCount;
+            rb.drag = playerData.groundDrag;
+            if (rb.velocity.y < -0.1f) {
+                jumps = maxJumpCount;
+            }
         } else {
-            rb.drag = pd.groundDrag / 2;
+            rb.drag = playerData.groundDrag / 2;
         }
     }
 
     void FixedUpdate() 
     {
         // Add force in the direction the player wants to move
-        if (!crouching) rb.AddForce(moveDirection.normalized * pd.playerSpeed * 10f);
-        else rb.AddForce(moveDirection.normalized * pd.playerSpeed / 2 * 10f);
+        if (!crouching) rb.AddForce(moveDirection.normalized * playerData.playerSpeed * 10f);
+        else rb.AddForce(moveDirection.normalized * playerData.playerSpeed / 2 * 10f);
     }
 }

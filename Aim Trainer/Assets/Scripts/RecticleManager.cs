@@ -8,6 +8,7 @@ public class RecticleManager : MonoBehaviour
     [SerializeField] GameObject hitHeadPrefab;
     [SerializeField] Transform parent;
 
+    // Spawn a recticle on the canvas when called
     public void CreateHitMarker(bool headshot = false)
     {
         if (!headshot) {

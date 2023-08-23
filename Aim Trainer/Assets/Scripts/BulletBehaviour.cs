@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class BulletBehaviour : MonoBehaviour
 {
-    [SerializeField] TrailRenderer tr;
+    [SerializeField] TrailRenderer trailRenderer;
     [SerializeField] float speed;
     [SerializeField] float lifeTime;
     [SerializeField] float trailLength;
     float timer;
 
+    // Initialise variables
     void Start()
     {
-        tr.time = trailLength;
+        trailRenderer.time = trailLength;
         timer = lifeTime;
     }
 
@@ -26,6 +27,7 @@ public class BulletBehaviour : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    // Destory bullet on impact
     void OnColliderEnter(Collider other) 
     {
         if (other.tag != "BulletIgnore") Destroy(gameObject);
